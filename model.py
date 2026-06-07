@@ -14,7 +14,7 @@ for img_name in os.listdir(file_path):
     img=Image.open(os.path.join(file_path,img_name))
     sizes=(set(img.size))
 
-#for image auhmentatiion 
+#for image auhmentatiion :)
 train_transforms = transforms.Compose([
     transforms.Grayscale(),
     transforms.Resize((140,140)),
