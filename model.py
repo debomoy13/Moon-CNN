@@ -51,18 +51,20 @@ data_augmentation = tf.keras.Sequential([
 
 model = tf.keras.Sequential([
     tf.keras.Input(shape=(128, 128, 1)),
+    data_augmentation,
     tf.keras.layers.Conv2D(32, kernel_size=3, padding='same', activation='relu'),
     tf.keras.layers.MaxPool2D(),
     tf.keras.layers.Conv2D(64, kernel_size=3, padding='same', activation='relu'),
     tf.keras.layers.MaxPool2D(),
     tf.keras.layers.Conv2D(128, kernel_size=3, padding='same', activation='relu'),
     tf.keras.layers.MaxPool2D(),
-    tf.keras.layers.Flatten(),
+    tf.keras.layers.GlobalAveragePooling2D(),
     tf.keras.layers.Dense(units=128, activation="relu", kernel_initializer="he_normal"),
     tf.keras.layers.Dropout(0.3),
     tf.keras.layers.Dense(4, activation='softmax')
 
-])  
+    ])  
+
 
 
 model.summary()  #for model summary 
