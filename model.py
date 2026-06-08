@@ -14,33 +14,53 @@ for img_name in os.listdir(file_path):
     img=Image.open(os.path.join(file_path,img_name))
     sizes=(set(img.size))
 
-#for image auhmentatiion :)
-train_transforms = transforms.Compose([
-    transforms.Grayscale(),
-    transforms.Resize((140,140)),
-    transforms.CenterCrop(128),
-    transforms.RandomRotation(degrees=360),
-    transforms.RandomHorizontalFlip(),
-    transforms.ColorJitter(brightness=0.2),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.5], std=[0.5])
-])
+from tensorflow.keras.preprocessing import image_dataset_from_directory
 
-#doing this for checking if the directory is correct 
-train_dataset = datasets.ImageFolder(
-    root='Train',              
-    transform=train_transforms
-)
-
-train_loader=DataLoader(
-    train_dataset,
+train_dataset = image_dataset_from_directory(
+    'Train',
+    image_size=(128, 128),
     batch_size=32,
+    color_mode='grayscale',
+    label_mode='int',
     shuffle=True
 )
-print(f'Total images: {len(train_dataset)}')
-print(f'Classes found: {train_dataset.classes}')
 
-## output is 
-## Total images: 249
-## Classes found: ['First Quarter', 'Full moon', 'Last Quarter', 'New moon'
-## above output is from the jupyter notebook file output 
+val_dataset = image_dataset_from_directory(
+    'Test',
+    image_size=(128, 128),
+    batch_size=32,
+    color_mode='grayscale',
+    label_mode='int',
+    shuffle=False
+)
+
+
+model = tf.keras.Sequential([
+    tf.keras.Input(shape=(128, 128, 1)),
+    tf.keras.layers.Conv2D(32, kernel_size=3, padding='same', activation='relu'),
+    tf.keras.layers.MaxPool2D(),
+    tf.keras.layers.Conv2D(64, kernel_size=3, padding='same', activation='relu'),
+    tf.keras.layers.MaxPool2D(),
+    tf.keras.layers.Conv2D(128, kernel_size=3, padding='same', activation='relu'),
+    tf.keras.layers.MaxPool2D(),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(units=128, activation="relu", kernel_initializer="he_normal"),
+    tf.keras.layers.Dropout(0.3),
+    tf.keras.layers.Dense(4, activation='softmax')
+
+])  
+
+
+model.summary()  #for model summary 
+
+model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+history = model.fit(
+    train_dataset,
+    epochs=20,
+    validation_data=val_dataset
+)
