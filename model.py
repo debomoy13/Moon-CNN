@@ -33,7 +33,21 @@ val_dataset = image_dataset_from_directory(
     label_mode='int',
     shuffle=False
 )
+import tensorflow as tf
 
+data_augmentation = tf.keras.Sequential([
+    tf.keras.layers.Resizing(140, 140),
+
+    tf.keras.layers.CenterCrop(128, 128),
+
+    tf.keras.layers.RandomRotation(1.0),
+
+    tf.keras.layers.RandomFlip("horizontal"),
+
+    tf.keras.layers.RandomBrightness(factor=0.2),
+
+    tf.keras.layers.Rescaling(1./127.5, offset=-1)
+])
 
 model = tf.keras.Sequential([
     tf.keras.Input(shape=(128, 128, 1)),
